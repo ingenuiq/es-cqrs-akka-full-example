@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5434:5432
+
+  cassandra:
+    image: cassandra:latest
+    ports:
+      - "9042:9042" # native protocol clients
+
+  zipkin:
+    image: openzipkin/zipkin
+    environment:
+      - STORAGE_TYPE=elasticsearch
+      - ES_HOSTS=elasticsearch
+      # Uncomment to see requests to and from elasticsearch
+      # - ES_HTTP_LOGGING=BODY
+    ports:
+      - 9411:9411
+
+  elasticsearch:
+    environment:
+      http.host: 0.0.0.0
+      transport.host: 127.0.0.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    ports:
+      - 9200:9200
+    restart: unless-stopped
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.2.4
+    user: root
+    depends_on:
+      - elasticsearch
+    command: filebeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=changeme -strict.perms=false
+    hostname: filebeat
+    restart: unless-stopped
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ../log:/opt/docker/log
+
+  kibana:
+    depends_on:
+    - elasticsearch
+    environment:
+      ELASTICSEARCH_PASSWORD: changeme
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: elastic
+    image: docker.elastic.co/kibana/kibana:6.2.4
+    ports:
+    - 5601:5601
+    restart: unless-stopped
+
+volumes:
+  grafana_data:
+  assetserver-images:
+  assetserver-backgrounds:
+

@@ -1,0 +1,33 @@
+@namespace("com.ingenuiq.note.events")
+protocol NotePersistentEvent {
+
+  import idl "PersistentEventMetadata.avdl";
+
+  record UpdatebleAvro {
+    union { null, string } value;
+  }
+
+  record NoteAvro {
+    string id;
+    union { null, string } title;
+    union { null, string } content;
+  }
+
+  record NoteCreatedAvro {
+    com.ingenuiq.common.PersistentEventMetadataAvro metadata;
+    NoteAvro note;
+  }
+
+  record NoteUpdatedAvro {
+    com.ingenuiq.common.PersistentEventMetadataAvro metadata;
+    string id;
+    union { null, UpdatebleAvro } title;
+    union { null, UpdatebleAvro } content;
+  }
+
+  record NoteDeletedAvro {
+    com.ingenuiq.common.PersistentEventMetadataAvro metadata;
+    string noteId;
+  }
+
+}

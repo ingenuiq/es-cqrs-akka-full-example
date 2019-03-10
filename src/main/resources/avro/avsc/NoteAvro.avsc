@@ -1,0 +1,15 @@
+{
+  "type" : "record",
+  "name" : "NoteAvro",
+  "namespace" : "com.ingenuiq.note.events",
+  "fields" : [ {
+    "name" : "id",
+    "type" : "string"
+  }, {
+    "name" : "title",
+    "type" : [ "null", "string" ]
+  }, {
+    "name" : "content",
+    "type" : [ "null", "string" ]
+  } ]
+}

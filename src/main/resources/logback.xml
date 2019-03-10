@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger %X{akkaSource} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>target/note.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger %X{akkaSource} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="com.datastax.driver.core" level="INFO"/>
+
+    <logger name="akka" level="INFO"/>
+    <logger name="com.zaxxer" level="WARN"/>
+    <logger name="io.netty" level="WARN"/>
+
+    <logger name="slick" level="INFO"/>
+
+</configuration>

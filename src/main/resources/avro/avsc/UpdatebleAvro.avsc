@@ -1,0 +1,9 @@
+{
+  "type" : "record",
+  "name" : "UpdatebleAvro",
+  "namespace" : "com.ingenuiq.note.events",
+  "fields" : [ {
+    "name" : "value",
+    "type" : [ "null", "string" ]
+  } ]
+}

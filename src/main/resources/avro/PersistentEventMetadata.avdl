@@ -1,0 +1,11 @@
+@namespace("com.ingenuiq.common")
+protocol Common {
+
+  record PersistentEventMetadataAvro {
+    string correlationId;
+    string eventId;
+    string userId;
+    long created;
+    string spanId;
+  }
+}

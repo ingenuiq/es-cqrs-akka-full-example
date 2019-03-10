@@ -1,0 +1,27 @@
+build/
+.idea
+target
+project/target
+journal/
+log/
+src/main/resources/assets
+src/main/resources/app
+cassandra/
+data/
+file~/
+swagger-editor/
+*.tgz
+
+
+######################
+# OS generated files #
+######################
+*/.DS_Store
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db

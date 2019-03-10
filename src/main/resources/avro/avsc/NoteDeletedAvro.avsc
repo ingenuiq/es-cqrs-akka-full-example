@@ -1,0 +1,32 @@
+{
+  "type" : "record",
+  "name" : "NoteDeletedAvro",
+  "namespace" : "com.ingenuiq.note.events",
+  "fields" : [ {
+    "name" : "metadata",
+    "type" : {
+      "type" : "record",
+      "name" : "PersistentEventMetadataAvro",
+      "namespace" : "com.ingenuiq.common",
+      "fields" : [ {
+        "name" : "correlationId",
+        "type" : "string"
+      }, {
+        "name" : "eventId",
+        "type" : "string"
+      }, {
+        "name" : "userId",
+        "type" : "string"
+      }, {
+        "name" : "created",
+        "type" : "long"
+      }, {
+        "name" : "spanId",
+        "type" : "string"
+      } ]
+    }
+  }, {
+    "name" : "noteId",
+    "type" : "string"
+  } ]
+}
