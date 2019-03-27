@@ -3,13 +3,19 @@ package com.ingenuiq.note.command.note
 import com.ingenuiq.note.common.{ EventId, NoteId, UserId }
 import com.ingenuiq.note.query.common.{ Command, Event, PersistentEvent, PersistentEventMetadata }
 
-sealed trait NoteCommand extends Command
+sealed trait NoteCommand extends Command {
+  def noteId: NoteId
+}
 
 object NoteCommand {
 
-  case class CreateNote(userId: UserId, note: Note) extends NoteCommand
+  case class CreateNote(userId: UserId, note: Note) extends NoteCommand {
+    override def noteId: NoteId = note.id
+  }
 
-  case class UpdateNote(userId: UserId, note: Note) extends NoteCommand
+  case class UpdateNote(userId: UserId, note: Note) extends NoteCommand {
+    override def noteId: NoteId = note.id
+  }
 
   case class DeleteNote(userId: UserId, noteId: NoteId) extends NoteCommand
 

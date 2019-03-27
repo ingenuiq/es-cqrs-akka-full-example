@@ -1,3 +1,5 @@
 package com.ingenuiq.note.query.dao.model
 
-case class PersistenceOffset(id: String, offset: Long)
+import akka.persistence.query.Offset
+
+case class PersistenceOffset(tag: String, offset: Offset)

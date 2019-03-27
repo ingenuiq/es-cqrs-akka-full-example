@@ -2,6 +2,7 @@ package com.ingenuiq.note.query.events
 
 import akka.actor.Props
 import com.ingenuiq.note.command.note.{ NoteAggregateActor, PersistentNoteEvent }
+import com.ingenuiq.note.command.persistence.TaggingEventAdapter
 import com.ingenuiq.note.query.common.ViewBuilderActor.Action
 import com.ingenuiq.note.query.common.{ BaseViewActor, PersistedEventEnvelope, ViewBuilderActor }
 import com.ingenuiq.note.query.dao.model.NoteEventSql
@@ -15,7 +16,7 @@ object NoteEventViewBuilder {
 }
 
 class NoteEventViewBuilder extends ViewBuilderActor {
-  override def persistenceId: String = NoteAggregateActor.persistenceId
+  override def tag: String = TaggingEventAdapter.noteTag
 
   override def identifier: String = "NoteEventViewBuilder"
 

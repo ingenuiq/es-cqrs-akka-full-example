@@ -32,5 +32,6 @@ lazy val root = project
     concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
     javaAgents += "org.aspectj" % "aspectjweaver" % "1.9.2",
     javaOptions in Universal += "-Dorg.aspectj.tracing.factory=default",
-    AvroSupport.avroSettings
+    AvroSupport.avroSettings,
+    resolvers +=   Resolver.bintrayRepo("tanukkii007", "maven")
   )

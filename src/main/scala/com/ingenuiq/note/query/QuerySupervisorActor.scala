@@ -11,10 +11,10 @@ object QuerySupervisorActor {
     Props(classOf[QuerySupervisorActor])
 }
 
-class QuerySupervisorActor extends Actor with BackoffActorHelper {
+class QuerySupervisorActor extends Actor with BackoffActorHelper with SingletonBootstrap {
 
-  context.actorOf(backoffActor(NoteViewBuilder.name, NoteViewBuilder()))
-  context.actorOf(backoffActor(NoteEventViewBuilder.name, NoteEventViewBuilder()))
+  startSingleton(context.system, backoffActor(NoteViewBuilder.name, NoteViewBuilder()), NoteViewBuilder.name)
+  startSingleton(context.system, backoffActor(NoteEventViewBuilder.name, NoteEventViewBuilder()), NoteEventViewBuilder.name)
 
   val noteHistoryViewActor:      ActorRef = context.actorOf(backoffActor(NoteView.name, NoteView()))
   val noteEventHistoryViewActor: ActorRef = context.actorOf(backoffActor(NoteEventView.name, NoteEventView()))

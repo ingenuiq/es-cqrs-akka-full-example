@@ -1,6 +1,7 @@
 package com.ingenuiq.note.integration.base
 
-import akka.actor.ActorRef
+import akka.actor.{ ActorRef, ActorSystem }
+import akka.cluster.Cluster
 import akka.http.scaladsl.server.{ Directives, Route }
 import akka.http.scaladsl.testkit.{ RouteTest, RouteTestTimeout, ScalatestRouteTest }
 import com.ingenuiq.note.command.CommandSupervisorActor
@@ -32,12 +33,14 @@ abstract class IntegrationBase
 
   implicit def default: RouteTestTimeout = RouteTestTimeout(new DurationInt(10).second)
 
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(10, Seconds), Span(200, Millis))
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(Span(10, Seconds), Span(500, Millis))
 
   lazy val commandActor: ActorRef = system.actorOf(CommandSupervisorActor(), "commandActor")
   lazy val queryActor:   ActorRef = system.actorOf(QuerySupervisorActor(), "queryActor")
 
   val settings: Settings = Settings.conf
+
+  setupCluster(system)
 
   lazy val commandRoutes: CommandRoutes = new CommandRoutes(commandActor, settings)
   lazy val queryRoutes:   QueryRoutes   = new QueryRoutes(queryActor, settings)
@@ -51,6 +54,11 @@ abstract class IntegrationBase
     super.beforeAll()
     EmbeddedCassandra.startCassandra()
     new TableDefinitionCreator().createQuerySchemaWithRetry(1)
+  }
+
+  def setupCluster(system: ActorSystem): Unit = {
+    val cluster = Cluster(system)
+    cluster.join(cluster.selfAddress)
   }
 
 }

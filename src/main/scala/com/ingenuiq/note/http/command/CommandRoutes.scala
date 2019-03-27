@@ -34,8 +34,9 @@ class CommandRoutes(commandActor: ActorRef, val settings: Settings)
         onSuccess(commandActor ? payload.toCreateCommand(userId)) {
           case e: NoteCreated =>
             logger.trace(s"Note created response")
-            logger.trace(s"Note created response")
             complete(StatusCodes.Created -> CommandResponse.NoteCreationResponse(e.note.id))
+          case NoteAlreadyExists =>
+            complete(StatusCodes.BadRequest -> ErrorMessageResponse("Note already exists"))
         }
       }
     }

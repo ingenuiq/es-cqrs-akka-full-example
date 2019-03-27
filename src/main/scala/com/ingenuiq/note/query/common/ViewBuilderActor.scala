@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.actor.{ Actor, PoisonPill }
 import akka.pattern.pipe
 import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
-import akka.persistence.query.{ EventEnvelope, PersistenceQuery }
+import akka.persistence.query.{ EventEnvelope, Offset, PersistenceQuery }
 import akka.stream.scaladsl.{ Flow, Sink, Source }
 import akka.stream.{ ActorMaterializer, ActorMaterializerSettings, Supervision }
 import com.typesafe.scalalogging.LazyLogging
@@ -21,10 +21,10 @@ object ViewBuilderActor {
   type Action[O] = () => Future[O]
 
   case class EnvelopeAndFunction(env:   PersistedEventEnvelope, action: Action[_])
-  case class LatestOffsetResult(offset: Long)
+  case class LatestOffsetResult(offset: Offset)
 }
 
-case class PersistedEventEnvelope(offset: Long, persistenceId: String, event: PersistentEvent, span: Span)
+case class PersistedEventEnvelope(offset: Offset, tag: String, event: PersistentEvent, span: Span)
 
 abstract class ViewBuilderActor extends Actor with LazyLogging {
 
@@ -51,7 +51,7 @@ abstract class ViewBuilderActor extends Actor with LazyLogging {
   val eventsFlow: Flow[EventEnvelope, Unit, NotUsed] =
     Flow[EventEnvelope]
       .collect {
-        case EventEnvelope(_, persistenceId, sequenceNr, event: PersistentEvent) =>
+        case EventEnvelope(offset, persistenceId, _, event: PersistentEvent) =>
           val parentSpan = Span.Remote(
             SpanContext(
               traceID          = identityProvider.traceIdGenerator().from(event.persistentEventMetadata.correlationId.value),
@@ -61,7 +61,7 @@ abstract class ViewBuilderActor extends Actor with LazyLogging {
             )
           )
           val span = Kamon.buildSpan("Reply from ES").asChildOf(parentSpan).start()
-          PersistedEventEnvelope(sequenceNr, persistenceId, event, span)
+          PersistedEventEnvelope(offset, persistenceId, event, span)
         case x =>
           throw new RuntimeException(s"Invalid event in the journal! $x")
       }
@@ -77,7 +77,7 @@ abstract class ViewBuilderActor extends Actor with LazyLogging {
 
   self ! "start"
 
-  def persistenceId: String
+  def tag: String
 
   def identifier: String
 
@@ -87,8 +87,8 @@ abstract class ViewBuilderActor extends Actor with LazyLogging {
     case "start" =>
       resumableProjection.fetchLatestOffset(identifier).map(LatestOffsetResult).pipeTo(self)
     case LatestOffsetResult(offset) =>
-      logger.info(s"Starting up view builder for entity $identifier, with persistenceId $persistenceId with offset of $offset")
-      val eventsSource: Source[EventEnvelope, NotUsed] = journal.eventsByPersistenceId(persistenceId, offset, Long.MaxValue)
+      logger.info(s"Starting up view builder for entity $identifier, with tag $tag with offset of $offset")
+      val eventsSource: Source[EventEnvelope, NotUsed] = journal.eventsByTag(tag, offset)
 
       eventsSource
         .via(eventsFlow)

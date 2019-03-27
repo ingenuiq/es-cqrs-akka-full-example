@@ -1,23 +1,37 @@
 package com.ingenuiq.note.command.note
 
 import akka.actor.{ ActorLogging, Props }
+import akka.cluster.sharding.ShardRegion
 import akka.persistence.{ PersistentActor, RecoveryCompleted }
 import com.ingenuiq.note.command.note.NoteCommand._
 import com.ingenuiq.note.command.note.NoteEvent._
-import com.ingenuiq.note.common.{ NoteId, UserId }
+import com.ingenuiq.note.common.UserId
 import com.ingenuiq.note.query.common.PersistentEventMetadata
 
 object NoteAggregateActor {
 
-  def apply(): Props = Props(classOf[NoteAggregateActor], NoteAggregateActor.persistenceId)
+  def apply(): Props = Props(classOf[NoteAggregateActor], "")
 
   val persistenceId: String = "NoteAggregateActor"
 
+  private val numberOfShards: Int = 30
+
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case e: NoteCommand => (e.noteId.value.toString, e)
+  }
+
+  val extractShardId: ShardRegion.ExtractShardId = {
+    case e: NoteCommand => (e.noteId.value.hashCode.abs % numberOfShards).toString
+    case ShardRegion.StartEntity(id) =>
+      // StartEntity is used by remembering entities feature
+      (id.toLong % numberOfShards).toString
+  }
+
 }
 
-class NoteAggregateActor(override val persistenceId: String) extends PersistentActor with ActorLogging {
+class NoteAggregateActor(val persistenceIdAddon: String = "") extends PersistentActor with ActorLogging {
 
-  var notes: Map[NoteId, Note] = Map.empty
+  var noteState: Option[Note] = None
 
   override def receiveRecover: Receive = {
     case e: PersistentNoteEvent => changeState(e)
@@ -26,7 +40,7 @@ class NoteAggregateActor(override val persistenceId: String) extends PersistentA
 
   override def receiveCommand: Receive = {
     case CreateNote(userId, note) =>
-      notes.get(note.id) match {
+      noteState match {
         case Some(_) =>
           log.info(s"Received create note with note id that already exists, ${note.id}")
           sender() ! NoteAlreadyExists
@@ -40,7 +54,7 @@ class NoteAggregateActor(override val persistenceId: String) extends PersistentA
       }
 
     case UpdateNote(userId, updatedNote) =>
-      notes.get(updatedNote.id) match {
+      noteState match {
         case None =>
           log.info("Received update for note that doesn't exit")
           sender() ! NoteNotFound
@@ -57,7 +71,7 @@ class NoteAggregateActor(override val persistenceId: String) extends PersistentA
       }
 
     case DeleteNote(userId, noteId) =>
-      notes.get(noteId) match {
+      noteState match {
         case Some(_) =>
           persist(NoteDeleted(PersistentEventMetadata(userId), noteId)) { e =>
             log.debug("Persisted note deletion")
@@ -88,9 +102,9 @@ class NoteAggregateActor(override val persistenceId: String) extends PersistentA
 
   def changeState: PartialFunction[PersistentNoteEvent, Unit] = {
     case e: NoteCreated =>
-      notes += e.note.id -> e.note
+      noteState = Some(e.note)
     case e: NoteUpdated =>
-      notes.get(e.noteId) match {
+      noteState match {
         case Some(note) =>
           val updatedNote = (e.title, e.content) match {
             case (Some(updateTitle), Some(updateContent)) => note.copy(title   = updateTitle, content = updateContent)
@@ -101,13 +115,15 @@ class NoteAggregateActor(override val persistenceId: String) extends PersistentA
               note
           }
 
-          notes += e.noteId -> updatedNote
+          noteState = Some(updatedNote)
         case None =>
           log.warning(s"Received event $e but there is no note")
       }
     case e: NoteDeleted =>
-      notes = notes.filter(_._1 != e.noteId)
+      noteState = None
 
   }
+
+  override def persistenceId: String = NoteAggregateActor.persistenceId + "-" + self.path.name + persistenceIdAddon
 
 }

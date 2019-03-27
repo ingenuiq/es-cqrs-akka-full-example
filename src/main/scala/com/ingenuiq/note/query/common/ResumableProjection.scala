@@ -24,10 +24,10 @@ class DBProjectionStorageExt(system: ActorSystem) extends Extension {
 
   val persistenceSequenceNrRepo: PersistenceOffsetRepo = PersistenceOffsetRepo()
 
-  def updateOffset(identifier: String, offset: Long): Future[Boolean] =
+  def updateOffset(identifier: String, offset: Offset): Future[Boolean] =
     persistenceSequenceNrRepo.upsert(PersistenceOffset(identifier, offset)).map(_ > 0)
 
-  def fetchLatestOffset(identifier: String): Future[Long] =
+  def fetchLatestOffset(identifier: String): Future[Offset] =
     persistenceSequenceNrRepo.getByPersistenceId(identifier).map(_.offset)
 }
 

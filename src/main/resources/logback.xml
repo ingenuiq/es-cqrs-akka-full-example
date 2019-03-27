@@ -3,9 +3,44 @@
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%date{ISO8601} %-5level %logger %X{akkaSource} %X{sourceThread} - %msg%n</pattern>
-        </encoder>
+        <if condition='property("LOG_FORMAT").contains("JSON")'>
+            <then>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <message/>
+                        <mdc/>
+                        <logstashMarkers/>
+                        <pattern>
+                            <pattern>
+                                {
+                                "timestamp": "%date{ISO8601}",
+                                "level": "%level",
+                                "class": "%replace(%logger.%M){'\\.\\?+|\\$*\\.\\$.+\\$+\\d*|\\$',''}",
+                                "thread": "%thread",
+                                "application": "note"
+                                }
+                            </pattern>
+                        </pattern>
+                        <arguments/>
+                        <stackTrace>
+                            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                                <maxLength>2048</maxLength>
+                                <shortenedClassNameLength>20</shortenedClassNameLength>
+                                <rootCauseFirst>true</rootCauseFirst>
+                            </throwableConverter>
+                        </stackTrace>
+                    </providers>
+                </encoder>
+            </then>
+            <else>
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <pattern>
+                        [%blue(%date{ISO8601})][%highlight(%-5level)][%magenta(%replace(%logger.%M){'\.\?+|\$*\.\$.+\$+\d*|\$',''})] - %msg %blue(%marker) [%cyan(%thread)] %n
+                    </pattern>
+                </encoder>
+            </else>
+        </if>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -23,7 +58,7 @@
 
     <logger name="com.datastax.driver.core" level="INFO"/>
 
-    <logger name="akka" level="INFO"/>
+    <logger name="akka" level="DEBUG"/>
     <logger name="com.zaxxer" level="WARN"/>
     <logger name="io.netty" level="WARN"/>
 

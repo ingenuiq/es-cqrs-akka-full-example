@@ -3,6 +3,8 @@ package com.ingenuiq.note.query.dao.common
 import java.time._
 import java.util.UUID
 
+import akka.persistence.query.{ NoOffset, Offset, TimeBasedUUID }
+import com.datastax.driver.core.utils.UUIDs
 import com.ingenuiq.note.common.{ CorrelationId, EventId, NoteId, UserId }
 import slick.jdbc.JdbcType
 
@@ -33,5 +35,16 @@ trait DbTypeMappers {
 
   implicit val correlationIdConverter: JdbcType[CorrelationId] =
     MappedColumnType.base[CorrelationId, String](_.value, e => CorrelationId(e))
+
+  private[this] def offsetToInternalOffset(offset: Offset): UUID =
+    offset match {
+      case TimeBasedUUID(uuid) => uuid
+      case NoOffset            => UUIDs.startOf(Instant.MIN.toEpochMilli)
+      case unsupported =>
+        throw new IllegalArgumentException("Cassandra does not support " + unsupported.getClass.getName + " offsets")
+    }
+
+  implicit val offsetMapper: JdbcType[Offset] =
+    MappedColumnType.base[Offset, UUID](e => offsetToInternalOffset(e), s => TimeBasedUUID(s))
 
 }

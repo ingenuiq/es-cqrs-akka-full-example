@@ -15,4 +15,4 @@ services:
   cassandra:
     image: cassandra:latest
     ports:
-      - "9042:9042" # native protocol clients
+      - "9042:9042"

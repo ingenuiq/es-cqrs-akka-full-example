@@ -15,6 +15,7 @@ abstract class InMemoryPersistenceBaseTrait
           .load()
           .withValue("akka.persistence.journal.plugin", ConfigValueFactory.fromAnyRef("inmemory-journal"))
           .withValue("akka.persistence.snapshot-store.plugin", ConfigValueFactory.fromAnyRef("inmemory-snapshot-store"))
+          .withValue("akka.actor.provider", ConfigValueFactory.fromAnyRef("local"))
       )
     )
     with WordSpecLike

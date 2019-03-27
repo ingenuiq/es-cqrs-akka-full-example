@@ -31,12 +31,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsgClass(classOf[NoteCreated])
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote))
+      expectMsg(Some(randomNote))
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote))
+      expectMsg(Some(randomNote))
     }
 
     "get error if not already exists" in {
@@ -49,12 +49,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsg(NoteAlreadyExists)
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote))
+      expectMsg(Some(randomNote))
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote))
+      expectMsg(Some(randomNote))
     }
   }
 
@@ -76,12 +76,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsgClass(classOf[NoteUpdated])
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote.copy(title = Some("new title"))))
+      expectMsg(Some(randomNote.copy(title = Some("new title"))))
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote.copy(title = Some("new title"))))
+      expectMsg(Some(randomNote.copy(title = Some("new title"))))
     }
 
     "update note content" in {
@@ -94,12 +94,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsgClass(classOf[NoteUpdated])
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote.copy(content = Some("new content"))))
+      expectMsg(Some(randomNote.copy(content = Some("new content"))))
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> randomNote.copy(content = Some("new content"))))
+      expectMsg(Some(randomNote.copy(content = Some("new content"))))
     }
 
     "update note title and content" in {
@@ -112,12 +112,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsgClass(classOf[NoteUpdated])
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> Note(randomNote.id, Some("new title"), Some("new content"))))
+      expectMsg(Some(Note(randomNote.id, Some("new title"), Some("new content"))))
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map(randomNote.id -> Note(randomNote.id, Some("new title"), Some("new content"))))
+      expectMsg(Some(Note(randomNote.id, Some("new title"), Some("new content"))))
     }
 
   }
@@ -140,12 +140,12 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
       expectMsgClass(classOf[NoteDeleted])
 
       aggregate ! GetInternalState
-      expectMsg(Map.empty)
+      expectMsg(None)
 
       aggregate ! RestartActor
 
       aggregate ! GetInternalState
-      expectMsg(Map.empty)
+      expectMsg(None)
     }
   }
 
@@ -179,10 +179,10 @@ class NoteAggregateActorSpec extends InMemoryPersistenceBaseTrait with NoteModel
 
 trait GetNoteInternalStateActor extends PersistentActor {
 
-  var notes: Map[NoteId, Note]
+  var noteState: Option[Note]
 
   private def receivedInternalStateCommand: Receive = {
-    case GetInternalState    => sender() ! notes
+    case GetInternalState    => sender() ! noteState
     case GetPartialFunctions => sender() ! ActorPartialFunctions(receiveCommand, receiveRecover)
   }
 
