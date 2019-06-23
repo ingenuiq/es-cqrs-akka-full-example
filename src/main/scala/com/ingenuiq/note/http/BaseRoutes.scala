@@ -3,11 +3,11 @@ package com.ingenuiq.note.http
 import akka.actor.ActorRef
 import akka.event.Logging
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.HttpOriginRange
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.DebuggingDirectives
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import ch.megard.akka.http.cors.scaladsl.model.HttpOriginMatcher
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.ingenuiq.note.common.{ PredefinedTimeout, UserId }
 import com.ingenuiq.note.http.command.CommandRoutes
@@ -52,7 +52,7 @@ trait BaseRoutes extends LazyLogging with PlayJsonSupport with HealthCheckRoute 
   private val handleErrors: Directive[Unit] = handleRejections(rejectionHandler) & handleExceptions(exceptionHandler)
 
   private val corsSettings: CorsSettings = CorsSettings.defaultSettings
-    .withAllowedOrigins(HttpOriginRange.*)
+    .withAllowedOrigins(HttpOriginMatcher.*)
     .withAllowedMethods(List(HttpMethods.PUT, HttpMethods.GET, HttpMethods.POST, HttpMethods.OPTIONS, HttpMethods.DELETE))
 
   private def publicRoutes: Route = healthCheckRoute
