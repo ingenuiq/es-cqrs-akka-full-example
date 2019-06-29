@@ -1,3 +1,8 @@
+# More detailed architecture explained at
+
+ 
+ [ES/CQRS the Akka way](https://medium.com/@reeebuuk/es-cqrs-the-akka-way-abbb3ffb89a1) 
+
 # Event sourcing / CQRS Note example Service
 
 Application is built in CQRS (Command Query Responsibility Segregation) fashion:
@@ -22,6 +27,9 @@ Dependencies: Java 8 & sbt
 - Go to http://localhost:9001/ to test the application
 
 ### Example of API usage
+
+I've run /docker/docker-compose -f docker-compose-essentials.yml + sbt run
+Hit it with create note and fetch note, no issues. Can you tell me where do you see the error @naheedmk ?
 
 ##### Creation of new note
 Request:
