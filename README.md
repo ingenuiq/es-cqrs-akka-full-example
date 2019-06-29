@@ -28,9 +28,6 @@ Dependencies: Java 8 & sbt
 
 ### Example of API usage
 
-I've run /docker/docker-compose -f docker-compose-essentials.yml + sbt run
-Hit it with create note and fetch note, no issues. Can you tell me where do you see the error @naheedmk ?
-
 ##### Creation of new note
 Request:
 
