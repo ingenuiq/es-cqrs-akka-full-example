@@ -3,34 +3,34 @@ import sbt._
 object Dependencies {
 
   private[this] object Versions {
-    val akka:                     String = "2.5.23"
-    val akkaHttp:                 String = "10.1.8"
-    val akkaHttpCors:             String = "0.4.1"
-    val akkaPersistenceInmemory:  String = "2.5.1.1"
-    val akkaPersistenceCassandra: String = "0.98"
-    val enumeratum:               String = "1.5.13"
+    val akka:                     String = "2.6.13"
+    val akkaHttp:                 String = "10.2.4"
+    val akkaHttpCors:             String = "1.1.1"
+    val akkaPersistenceInmemory:  String = "2.5.15.2"
+    val akkaPersistenceCassandra: String = "1.0.5"
+    val enumeratum:               String = "1.6.1"
     val logbackClassic:           String = "1.2.3"
-    val playJson:                 String = "2.7.4"
-    val pureConfig:               String = "0.11.1"
+    val playJson:                 String = "2.9.2"
+    val pureConfig:               String = "0.14.1"
     val scalaLogging:             String = "3.9.2"
-    val scalaTest:                String = "3.0.8"
-    val akkaInMemory:             String = "2.5.1.1"
-    val avro4s:                   String = "2.0.4"
-    val slick:                    String = "3.3.2"
-    val postgres:                 String = "42.2.6"
-    val h2:                       String = "1.4.199"
+    val scalaTest:                String = "3.2.6"
+    val avro4s:                   String = "4.0.4"
+    val slick:                    String = "3.3.3"
+    val postgres:                 String = "42.2.19"
+    val h2:                       String = "1.4.200"
     val classutil:                String = "1.5.1"
-    val mockitoCore:              String = "2.28.2"
-    val commonsCodec:             String = "1.12"
-    val slf4jVersion:             String = "1.7.26"
+    val mockitoCore:              String = "3.8.0"
+    val commonsCodec:             String = "1.15"
+    val slf4j:                    String = "1.7.30"
+    val kamon:                    String = "2.1.12"
   }
 
   val all: Seq[ModuleID] = ProductionDependencies.values ++ TestDependencies.values
 
   private[this] object ProductionDependencies {
 
-    val values
-      : Seq[ModuleID] = akka ++ avro4s ++ playJson ++ pureConfig ++ logging ++ query ++ postgres ++ enumeratum ++ kamon ++ commonCodec
+    val values: Seq[ModuleID] =
+      akka ++ avro4s ++ playJson ++ pureConfig ++ logging ++ query ++ postgres ++ enumeratum ++ kamon ++ commonCodec
 
     private lazy val akka: Seq[ModuleID] = Seq(
       "com.typesafe.akka"      %% "akka-actor"                 % Versions.akka,
@@ -41,7 +41,7 @@ object Dependencies {
       "com.typesafe.akka"      %% "akka-http-core"             % Versions.akkaHttp,
       "com.typesafe.akka"      %% "akka-persistence-cassandra" % Versions.akkaPersistenceCassandra,
       "ch.megard"              %% "akka-http-cors"             % Versions.akkaHttpCors,
-      "org.scala-lang.modules" %% "scala-xml"                  % "1.2.0"
+      "org.scala-lang.modules" %% "scala-xml"                  % "1.3.0"
     )
 
     private lazy val avro4s: Seq[ModuleID] = Seq("com.sksamuel.avro4s" %% "avro4s-core" % Versions.avro4s)
@@ -49,11 +49,12 @@ object Dependencies {
     private lazy val logging: Seq[ModuleID] = Seq(
       "ch.qos.logback"             % "logback-classic"  % Versions.logbackClassic,
       "com.typesafe.scala-logging" %% "scala-logging"   % Versions.scalaLogging,
-      "org.slf4j"                  % "log4j-over-slf4j" % Versions.slf4jVersion,
+      "org.slf4j"                  % "log4j-over-slf4j" % Versions.slf4j,
       "com.typesafe.akka"          %% "akka-slf4j"      % Versions.akka
     )
 
     private lazy val pureConfig: Seq[ModuleID] = Seq("com.github.pureconfig" %% "pureconfig" % Versions.pureConfig)
+
     private lazy val query: Seq[ModuleID] =
       Seq("com.typesafe.slick" %% "slick" % Versions.slick, "com.typesafe.slick" %% "slick-hikaricp" % Versions.slick)
 
@@ -64,16 +65,10 @@ object Dependencies {
     private lazy val playJson: Seq[ModuleID] = Seq("com.typesafe.play" %% "play-json" % Versions.playJson)
 
     private lazy val kamon: Seq[ModuleID] = Seq(
-      "io.kamon" %% "kamon-akka-2.5"        % "1.1.4",
-      "io.kamon" %% "kamon-scala-future"    % "1.1.0",
-      "io.kamon" %% "kamon-core"            % "1.1.6",
-      "io.kamon" %% "kamon-logback"         % "1.0.7",
-      "io.kamon" %% "kamon-zipkin"          % "1.0.1",
-      "io.kamon" %% "kamon-akka-http-2.5"   % "1.1.2",
-      "io.kamon" %% "kamon-prometheus"      % "1.1.2",
-      "io.kamon" %% "kamon-system-metrics"  % "1.0.1",
-      "io.kamon" %% "kamon-jdbc"            % "1.1.0",
-      "io.kamon" %% "kamon-akka-remote-2.5" % "1.1.0"
+      "io.kamon" %% "kamon-core"       % Versions.kamon,
+      "io.kamon" %% "kamon-zipkin"     % Versions.kamon,
+      "io.kamon" %% "kamon-prometheus" % Versions.kamon,
+      "io.kamon" %% "kamon-bundle"     % Versions.kamon
     )
 
     private lazy val commonCodec: Seq[ModuleID] = Seq("commons-codec" % "commons-codec" % Versions.commonsCodec)

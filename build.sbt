@@ -4,7 +4,7 @@ val projectName         = "full-cqrs-example"
 val projectOrganization = "com.ingenuiq"
 val mainClassName       = "com.ingenuiq.note.Main"
 
-lazy val generateAvsc  = taskKey[Unit]("Generate .avsc from .avdl for avro")
+lazy val generateAvsc = taskKey[Unit]("Generate .avsc from .avdl for avro")
 
 import org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings
 inConfig(IntegrationTest)(scalafmtConfigSettings)

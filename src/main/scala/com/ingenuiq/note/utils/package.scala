@@ -2,17 +2,18 @@ package com.ingenuiq.note
 
 import java.time._
 
-import kamon.Kamon
-
 package object utils {
 
   val defaultZone: ZoneId = ZoneId.of("UTC")
 
   def now(zoneId: ZoneId = defaultZone): LocalDateTime = LocalDateTime.now(zoneId)
 
-  def currentSpanId:       String = Kamon.currentSpan().context().spanID.string
-  def currentParentSpanId: String = Kamon.currentSpan().context().parentID.string
-  def currentTraceId:      String = Kamon.currentSpan().context().traceID.string
+  def currentSpanId:       String = "Kamon.currentSpan().context().spanID.string"
+  def currentParentSpanId: String = "Kamon.currentSpan().context().parentID.string"
+  def currentTraceId:      String = "Kamon.currentSpan().context().traceID.string"
+//  def currentSpanId:       String = Kamon.currentSpan().context().spanID.string
+//  def currentParentSpanId: String = Kamon.currentSpan().context().parentID.string
+//  def currentTraceId:      String = Kamon.currentSpan().context().traceID.string
 
   def localDateTimeToLong(date: LocalDateTime): Long          = date.toInstant(ZoneOffset.UTC).toEpochMilli
   def longToLocalDateTime(date: Long):          LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneOffset.UTC)

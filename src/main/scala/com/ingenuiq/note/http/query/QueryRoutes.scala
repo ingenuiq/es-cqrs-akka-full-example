@@ -28,12 +28,10 @@ class QueryRoutes(queryActor: ActorRef, settings: Settings)
       pathTail(NotePath) {
         get(getNotes)
       } ~
-        pathTail(NotePath / EventPath) {
-          get(getNoteEvents)
-        } ~
-        pathTail(NotePath / ID) { id: NoteId =>
-          get(getNoteById(id))
-        }
+      pathTail(NotePath / EventPath) {
+        get(getNoteEvents)
+      } ~
+      pathTail(NotePath / ID) { id: NoteId => get(getNoteById(id)) }
     }
 
   def getNoteEvents(implicit userId: UserId): Route =

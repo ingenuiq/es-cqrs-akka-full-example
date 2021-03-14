@@ -25,14 +25,11 @@ class NoteViewBuilder extends ViewBuilderActor {
   override def actionFor(env: PersistedEventEnvelope): Action[_] =
     env.event match {
       case ur: NoteCreated =>
-        () =>
-          noteRepo.insertNote(ur)
+        () => noteRepo.insertNote(ur)
       case ur: NoteUpdated =>
-        () =>
-          noteRepo.updateNote(ur)
+        () => noteRepo.updateNote(ur)
       case ur: NoteDeleted =>
-        () =>
-          noteRepo.removeNote(ur)
+        () => noteRepo.removeNote(ur)
     }
 }
 

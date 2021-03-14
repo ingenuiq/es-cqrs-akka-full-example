@@ -3,7 +3,9 @@ package com.ingenuiq.note.command
 import akka.actor.ActorSystem
 import akka.testkit.{ ImplicitSender, TestKit }
 import com.typesafe.config.{ ConfigFactory, ConfigValueFactory }
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpecLike }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration.{ FiniteDuration, SECONDS }
 
@@ -17,7 +19,7 @@ abstract class InMemoryPersistenceBaseTrait
           .withValue("akka.persistence.snapshot-store.plugin", ConfigValueFactory.fromAnyRef("inmemory-snapshot-store"))
       )
     )
-    with WordSpecLike
+    with AnyWordSpecLike
     with Matchers
     with BeforeAndAfterAll
     with ImplicitSender {

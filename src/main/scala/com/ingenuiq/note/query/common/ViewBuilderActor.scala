@@ -5,11 +5,9 @@ import akka.actor.{ Actor, PoisonPill }
 import akka.pattern.pipe
 import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
 import akka.persistence.query.{ EventEnvelope, PersistenceQuery }
+import akka.stream.Supervision
 import akka.stream.scaladsl.{ Flow, Sink, Source }
-import akka.stream.{ ActorMaterializer, ActorMaterializerSettings, Supervision }
 import com.typesafe.scalalogging.LazyLogging
-import kamon.Kamon
-import kamon.trace.{ IdentityProvider, Span, SpanContext }
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -24,14 +22,13 @@ object ViewBuilderActor {
   case class LatestOffsetResult(offset: Long)
 }
 
-case class PersistedEventEnvelope(offset: Long, persistenceId: String, event: PersistentEvent, span: Span)
+case class PersistedEventEnvelope(offset: Long, persistenceId: String, event: PersistentEvent)
 
 abstract class ViewBuilderActor extends Actor with LazyLogging {
 
   import ViewBuilderActor._
   import context.dispatcher
-
-  val identityProvider: IdentityProvider = new IdentityProvider.Default
+  import context.system
 
   val decider: Supervision.Decider = {
     case NonFatal(ex) =>
@@ -42,36 +39,19 @@ abstract class ViewBuilderActor extends Actor with LazyLogging {
       Supervision.Stop
   }
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer(
-    ActorMaterializerSettings(context.system).withSupervisionStrategy(decider)
-  )
-
   val resumableProjection = ResumableProjection(identifier, context.system)
 
   val eventsFlow: Flow[EventEnvelope, Unit, NotUsed] =
     Flow[EventEnvelope]
       .collect {
         case EventEnvelope(_, persistenceId, sequenceNr, event: PersistentEvent) =>
-          val parentSpan = Span.Remote(
-            SpanContext(
-              traceID          = identityProvider.traceIdGenerator().from(event.persistentEventMetadata.correlationId.value),
-              spanID           = identityProvider.spanIdGenerator().generate(),
-              parentID         = identityProvider.spanIdGenerator().from(event.persistentEventMetadata.spanId),
-              samplingDecision = SpanContext.SamplingDecision.Sample
-            )
-          )
-          val span = Kamon.buildSpan("Reply from ES").asChildOf(parentSpan).start()
-          PersistedEventEnvelope(sequenceNr, persistenceId, event, span)
+          PersistedEventEnvelope(sequenceNr, persistenceId, event)
         case x =>
           throw new RuntimeException(s"Invalid event in the journal! $x")
       }
       .map(env => EnvelopeAndFunction(env, actionFor(env)))
       .mapAsync(parallelism = 1) { case EnvelopeAndFunction(env, f) => f.apply().map(_ => env) }
-      .mapAsync(parallelism = 1) { env =>
-        val span = resumableProjection.updateOffset(identifier, env.offset).map(_ => ())
-        env.span.finish()
-        span
-      }
+      .mapAsync(parallelism = 1)(env => resumableProjection.updateOffset(identifier, env.offset).map(_ => ()))
 
   val journal: CassandraReadJournal = PersistenceQuery(context.system).readJournalFor[CassandraReadJournal](CassandraReadJournal.Identifier)
 

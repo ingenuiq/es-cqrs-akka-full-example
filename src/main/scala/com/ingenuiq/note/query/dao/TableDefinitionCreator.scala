@@ -39,11 +39,11 @@ class TableDefinitionCreator(implicit ec: ExecutionContext)
     if (last < retries) {
       val futureCreation: Future[List[Unit]] = db
         .run(MTable.getTables)
-        .flatMap(v => {
+        .flatMap { v =>
           val names            = v.map(mt => mt.name.name)
           val createIfNotExist = tables.filter(table => !names.contains(table.baseTableRow.tableName)).map(_.schema.create)
           db.run(DBIO.sequence(createIfNotExist))
-        })
+        }
 
       Try(Await.result(futureCreation, 5.seconds)) match {
         case Success(_) => logger.info("Schema successfully generated")
@@ -79,9 +79,7 @@ class TableDefinitionCreator(implicit ec: ExecutionContext)
         case Success(tableList) =>
           val existingTableNames = tables.map(_.baseTableRow.tableName)
           val tableNames = tableList
-            .withFilter { table =>
-              table.name.schema.contains("public") && existingTableNames.contains(table.name.name)
-            }
+            .withFilter(table => table.name.schema.contains("public") && existingTableNames.contains(table.name.name))
             .map(_.name.name)
           logger.info(s"Found ${tableNames.size} tables to drop, tables: ${tableNames.mkString("[", ", ", "]")}")
           val futureDropTables: Future[Seq[Int]] = Future.sequence(tableNames.map(table => db.run(sqlu"""DROP TABLE "#$table"""")))

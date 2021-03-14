@@ -1,4 +1,5 @@
 package com.ingenuiq.note.utils
+
 import akka.actor.Props
 import akka.pattern.{ BackoffOpts, BackoffSupervisor }
 

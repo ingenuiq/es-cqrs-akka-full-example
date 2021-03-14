@@ -24,9 +24,7 @@ class CommandRoutes(commandActor: ActorRef, val settings: Settings)
     pathTail(NotePath) {
       post(createNote)
     } ~
-      pathTail(NotePath / ID) { id: NoteId =>
-        put(updateNote(id)) ~ delete(deleteNote(id))
-      }
+      pathTail(NotePath / ID) { id: NoteId => put(updateNote(id)) ~ delete(deleteNote(id)) }
 
   def createNote(implicit userId: UserId): Route =
     decodeRequest {

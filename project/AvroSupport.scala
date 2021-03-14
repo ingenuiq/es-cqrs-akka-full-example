@@ -21,7 +21,8 @@ object AvroSupport {
       try {
         s.log.info(s"Generating .avsc files in ${avscPath.getPath} from $sourceFilePath")
         new IdlToSchemataTool().run(null, null, null, arglist)
-      } catch {
+      }
+      catch {
         case e: Exception =>
           s.log.error("Exception during avsc generation " + e.getLocalizedMessage)
           throw e

@@ -33,6 +33,7 @@ class DBProjectionStorageExt(system: ActorSystem) extends Extension {
 
 object DBProjectionStorage extends ExtensionId[DBProjectionStorageExt] with ExtensionIdProvider {
   override def lookup: DBProjectionStorage.type = DBProjectionStorage
+
   override def createExtension(system: ExtendedActorSystem) =
     new DBProjectionStorageExt(system)
 }

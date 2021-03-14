@@ -28,8 +28,6 @@ trait ClassUtils {
       def compare(info: ClassInfo): Boolean =
         info.name == ancestorInfo.name || (info.superClassName :: info.interfaces).exists(n => classes.get(n).exists(compare))
 
-      classes.valuesIterator.filter { info =>
-        info.isConcrete && compare(info)
-      }.toList
+      classes.valuesIterator.filter(info => info.isConcrete && compare(info)).toList
     }
 }

@@ -3,11 +3,13 @@ package com.ingenuiq.note.base
 import com.ingenuiq.note.settings.Settings
 import com.ingenuiq.note.utils.{ NoteModelsHelper, SchemaTestHelper }
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{ Millis, Span }
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, Matchers, WordSpec }
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 
 abstract class BaseRepoSpec
-    extends WordSpec
+    extends AnyWordSpec
     with NoteModelsHelper
     with ScalaFutures
     with Matchers

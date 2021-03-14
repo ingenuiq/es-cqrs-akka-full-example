@@ -6,8 +6,8 @@ import com.ingenuiq.note.base.RestartableActor.{ RestartActor, RestartActorExcep
 trait RestartableActor extends PersistentActor {
 
   abstract override def receiveCommand: Receive = super.receiveCommand orElse {
-    case RestartActor => throw new RestartActorException("Test - Restarting with exception")
-  }
+      case RestartActor => throw new RestartActorException("Test - Restarting with exception")
+    }
 }
 
 object RestartableActor {

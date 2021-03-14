@@ -45,7 +45,7 @@ object AvroConverters {
       eventId       = EventId(UUID.fromString(metadata.eventId)),
       userId        = UserId(metadata.userId),
       created       = longToLocalDateTime(metadata.created),
-      spanId        = metadata.spanId,
+      spanId        = metadata.spanId
     )
 
   def from(e: NoteCreated): NoteCreatedAvro =

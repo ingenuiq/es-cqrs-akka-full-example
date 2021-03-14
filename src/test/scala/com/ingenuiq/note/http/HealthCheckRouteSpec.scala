@@ -3,10 +3,11 @@ package com.ingenuiq.note.http
 import akka.http.scaladsl.server.Directives
 import akka.http.scaladsl.testkit.{ RouteTest, ScalatestRouteTest }
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 class HealthCheckRouteSpec
-    extends WordSpec
+    extends AnyWordSpec
     with HealthCheckRoute
     with Matchers
     with Eventually

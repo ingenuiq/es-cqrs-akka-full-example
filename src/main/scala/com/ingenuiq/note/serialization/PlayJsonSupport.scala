@@ -13,6 +13,7 @@ import scala.collection.immutable.Seq
 object PlayJsonSupport extends PlayJsonSupport {
 
   final case class PlayJsonError(error: JsError) extends RuntimeException {
+
     override def getMessage: String =
       JsError.toJson(error).toString()
   }
@@ -42,9 +43,7 @@ trait PlayJsonSupport {
     def read(json: JsValue) =
       implicitly[Reads[A]]
         .reads(json)
-        .recoverTotal { e =>
-          throw RejectionError(ValidationRejection(JsError.toJson(e).toString, Some(PlayJsonError(e))))
-        }
+        .recoverTotal(e => throw RejectionError(ValidationRejection(JsError.toJson(e).toString, Some(PlayJsonError(e)))))
     jsonStringUnmarshaller.map(data => read(Json.parse(data)))
   }
 

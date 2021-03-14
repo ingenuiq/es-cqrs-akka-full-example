@@ -25,8 +25,7 @@ class NoteEventViewBuilder extends ViewBuilderActor {
   override def actionFor(env: PersistedEventEnvelope): Action[_] =
     env.event match {
       case pne: PersistentNoteEvent =>
-        () =>
-          noteEventRepo.upsertNoteEvent(NoteEventSql.toSql(pne))
+        () => noteEventRepo.upsertNoteEvent(NoteEventSql.toSql(pne))
     }
 }
 

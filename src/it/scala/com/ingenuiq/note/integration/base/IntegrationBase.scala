@@ -12,14 +12,16 @@ import com.ingenuiq.note.query.QuerySupervisorActor
 import com.ingenuiq.note.query.dao.TableDefinitionCreator
 import com.ingenuiq.note.serialization.PlayJsonSupport
 import com.ingenuiq.note.settings.Settings
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{ Millis, Seconds, Span }
-import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.concurrent.duration.DurationInt
 
 abstract class IntegrationBase
-    extends WordSpec
+    extends AnyWordSpec
     with Matchers
     with Eventually
     with BeforeAndAfterAll

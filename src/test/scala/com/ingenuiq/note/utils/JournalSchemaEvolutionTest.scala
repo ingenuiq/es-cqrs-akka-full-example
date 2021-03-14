@@ -3,9 +3,10 @@ package com.ingenuiq.note.utils
 import com.ingenuiq.note.command.persistence.{ SchemaInfo, StatementSchemaMap }
 import org.apache.avro.SchemaCompatibility
 import org.apache.avro.SchemaCompatibility.SchemaCompatibilityType
-import org.scalatest.{ FreeSpec, Matchers }
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
-class JournalSchemaEvolutionTest extends FreeSpec with Matchers {
+class JournalSchemaEvolutionTest extends AnyFreeSpec with Matchers {
 
   val (currentSchemaPairs: List[SchemaInfo], allSchemaPairs: List[SchemaInfo]) = StatementSchemaMap()
 

@@ -15,9 +15,7 @@ import kamon.zipkin.ZipkinReporter
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
-object Main extends App with LazyLogging with BaseRoutes {
-
-  val startSpan = Kamon.buildSpan("startup").start()
+object Main extends App with KamonInit with LazyLogging with BaseRoutes {
 
   implicit val system:           ActorSystem       = ActorSystem("note-actor-system")
   implicit val materializer:     ActorMaterializer = ActorMaterializer()
@@ -32,7 +30,7 @@ object Main extends App with LazyLogging with BaseRoutes {
 
   if (settings.tracingMonitoringSettings.zipkinEnabled) {
     logger.info("Zipkin tracing enabled")
-    Kamon.addReporter(new ZipkinReporter)
+//    Kamon.addReporter(new ZipkinReporter)
   }
   else
     logger.info("Zipkin tracing disabled")
@@ -43,7 +41,6 @@ object Main extends App with LazyLogging with BaseRoutes {
   bindingFutureHttp.onComplete {
     case Success(_) =>
       logger.info(s"Server started on [${settings.httpListenerSettings.interface}:${settings.httpListenerSettings.port}]")
-      startSpan.finish()
     case Failure(error) => logger.error(s"Error binding HTTP listener: $error")
   }
 
@@ -53,4 +50,8 @@ object Main extends App with LazyLogging with BaseRoutes {
       system.terminate()
     }
   }
+}
+
+trait KamonInit {
+//  Kamon.init()
 }

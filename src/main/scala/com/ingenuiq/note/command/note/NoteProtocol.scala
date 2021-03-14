@@ -18,6 +18,7 @@ object NoteCommand {
 sealed trait NoteEvent extends Event
 
 sealed trait NoteQueryEvent extends NoteEvent
+
 sealed trait PersistentNoteEvent extends NoteEvent with PersistentEvent {
   def noteId: NoteId
 }

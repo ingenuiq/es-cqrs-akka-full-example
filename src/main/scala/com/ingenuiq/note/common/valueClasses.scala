@@ -24,6 +24,7 @@ object EventId {
   def generateNew = EventId(UUID.randomUUID)
 
   implicit val eventIdWrites: Writes[EventId] = (t: EventId) => JsString(t.value.toString)
+
   implicit val eventIdReads: Reads[EventId] = {
     case e: JsString => JsSuccess(EventId(UUID.fromString(e.value)))
     case e => JsError(s"Expecting JsString in EventId reads but got $e")
@@ -37,6 +38,7 @@ object UserId {
   def generateNew   = UserId(UUID.randomUUID.toString)
 
   implicit val userIdWrites: Writes[UserId] = (t: UserId) => JsString(t.value.toString)
+
   implicit val userIdReads: Reads[UserId] = {
     case e: JsString => JsSuccess(UserId(e.value))
     case e => JsError(s"Expecting JsString in UserId reads but got $e")
@@ -47,6 +49,7 @@ object CorrelationId {
   val noCorrelationId: CorrelationId = CorrelationId("00000000-0000-0000-0000-000000000000")
 
   implicit val correlationIdWrites: Writes[CorrelationId] = (t: CorrelationId) => JsString(t.value.toString)
+
   implicit val correlationIdReads: Reads[CorrelationId] = {
     case e: JsString => JsSuccess(CorrelationId(e.value))
     case e => JsError(s"Expecting JsString in correlationId reads but got $e")
