@@ -21,7 +21,7 @@ class TableDefinitionCreator(implicit ec: ExecutionContext)
 
   protected val tables = List(notes, noteEvents, persistenceOffsets)
 
-  private val fibonacci: Stream[Int] = 0 #:: 1 #:: (fibonacci zip fibonacci.tail).map(t => t._1 + t._2)
+  private val fibonacci: LazyList[Int] = 0 #:: 1 #:: (fibonacci zip fibonacci.tail).map(t => t._1 + t._2)
 
   def rebuildSchema(rebuildReadside: Boolean): Unit = {
     if (rebuildReadside) {

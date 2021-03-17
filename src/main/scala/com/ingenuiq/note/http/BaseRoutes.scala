@@ -35,7 +35,7 @@ trait BaseRoutes extends LazyLogging with PlayJsonSupport with HealthCheckRoute 
         case res @ HttpResponse(_, _, ent: HttpEntity.Strict, _) =>
           // since all Akka default rejection responses are Strict this will handle all rejections
           val message = ent.data.utf8String.replaceAll("\"", """\"""")
-          res.copy(entity = HttpEntity(ContentTypes.`application/json`, s"""{"rejection": "$message"}"""))
+          res.withEntity(entity = HttpEntity(ContentTypes.`application/json`, s"""{"rejection": "$message"}"""))
 
         case x => x // pass through all other types of responses
       }

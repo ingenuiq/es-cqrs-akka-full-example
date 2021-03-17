@@ -24,7 +24,7 @@ abstract class InMemoryPersistenceBaseTrait
     with BeforeAndAfterAll
     with ImplicitSender {
 
-  override def afterAll: Unit =
+  override def afterAll(): Unit =
     TestKit.shutdownActorSystem(system)
 
   val waitToMessageTimeout = FiniteDuration(1, SECONDS)

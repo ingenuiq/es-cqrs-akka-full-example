@@ -16,7 +16,8 @@ trait ClassUtils {
       (Thread.currentThread().getContextClassLoader match {
         case classLoader: URLClassLoader => classLoader.getURLs
         case classLoader => classLoader.getParent.asInstanceOf[URLClassLoader].getURLs
-      }).withFilter(x => filter.forall(x.getPath.contains))
+      }).toList
+        .filter(x => filter.forall(x.getPath.contains))
         .map(x => new File(x.getPath.replaceAll("%20", " ")))
     )
 

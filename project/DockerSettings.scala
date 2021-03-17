@@ -34,7 +34,6 @@ object DockerSettings {
           "BUILD_COMMIT" -> git.gitHeadCommit.value.getOrElse(""),
           "BUILD_TIME" -> Clock.systemUTC().instant().toString,
           "SERVICE_NAME" -> sys.env.getOrElse("SERVICE_NAME", name.value)
-        ),
-    packageName in Docker := sys.env.getOrElse("DOCKER_IMAGE_NAME", name.value)
+        )
   )
 }

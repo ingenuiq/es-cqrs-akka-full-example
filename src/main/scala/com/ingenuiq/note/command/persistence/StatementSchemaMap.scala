@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.apache.avro.Schema
 import org.apache.commons.codec.digest.DigestUtils
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.io.Source
 
 case class SchemaInfo(manifestHash: HashFingerprint, schema: Schema, filePath: String)
@@ -58,7 +58,7 @@ object StatementSchemaMap extends LazyLogging {
   private lazy val currentSchemaPairs: List[SchemaInfo] =
     activeSchemaFilenames.collect {
       case filename if filename.endsWith(CUT_LINE) =>
-        val inputStream = Source.fromResource(activeSchemasPath + "/" + filename).getLines.mkString(" ")
+        val inputStream = Source.fromResource(activeSchemasPath + "/" + filename).getLines().mkString(" ")
         val fingerprint: HashFingerprint = getMD5FromUrl(inputStream)
         val schema:      Schema          = getSchemaFromUrl(inputStream)
         SchemaInfo(fingerprint, schema, activeSchemasPath + "/" + filename)
@@ -67,7 +67,7 @@ object StatementSchemaMap extends LazyLogging {
   private lazy val historySchemaPairs: List[SchemaInfo] =
     historyVersionSchemaFilenames.collect {
       case filename if filename.endsWith(CUT_LINE) =>
-        val inputStream = Source.fromResource(historyVersionSchemasPath + "/" + filename).getLines.mkString(" ")
+        val inputStream = Source.fromResource(historyVersionSchemasPath + "/" + filename).getLines().mkString(" ")
         val fingerprint: HashFingerprint = getMD5FromUrl(inputStream)
         val schema:      Schema          = getSchemaFromUrl(inputStream)
         SchemaInfo(fingerprint, schema, historyVersionSchemasPath + "/" + filename)
