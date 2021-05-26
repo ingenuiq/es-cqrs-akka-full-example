@@ -1,4 +1,4 @@
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport.{ scalafmtOnCompile, _ }
 import sbt.{ Compile, Resolver, Setting, URL }
 import sbt.Keys._
 
@@ -19,8 +19,8 @@ object Settings {
           "-Xlint:adapted-args" // Warn if an argument list is modified to match the receiver.
           // "-Ywarn-value-discard" // Warn when non-Unit expression results are unused.
         ),
-    scalacOptions in (Compile, console) ~= (_.filterNot(Set("-Ywarn-unused:imports", "-Xfatal-warnings"))),
-    scalafmtOnCompile in Compile := true,
+    Compile / console / scalacOptions ~= (_.filterNot(Set("-Ywarn-unused:imports", "-Xfatal-warnings"))),
+    Compile / scalafmtOnCompile := true,
     publishMavenStyle := false
   )
 }

@@ -11,7 +11,7 @@ import sbt.Keys._
 object DockerSettings {
 
   lazy val settings: Seq[Setting[_]] = Seq(
-    daemonUser in Docker := "65534",
+    Docker / daemonUser := "65534",
     dockerAlias := DockerAlias(
           dockerRepository.value,
           dockerUsername.value,
