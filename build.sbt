@@ -19,6 +19,7 @@ lazy val root = project
     DockerSettings.settings,
     Compile / packageDoc / publishArtifact := false,
     libraryDependencies ++= Dependencies.all,
+    libraryDependencies ++= Dependencies.allScala2.map(_.cross(CrossVersion.for3Use2_13)),
     Compile / run / mainClass := Some(mainClassName),
     Compile / packageBin / mainClass := Some(mainClassName),
     executableScriptName := Project.normalizeModuleID(mainClassName.split('.').last),
@@ -33,4 +34,12 @@ lazy val root = project
     javaAgents += "org.aspectj" % "aspectjweaver" % "1.9.2",
     Universal / javaOptions += "-Dorg.aspectj.tracing.factory=default",
     AvroSupport.avroSettings
+//    resolvers ++= repos
   )
+
+//val repos = Seq(
+//  "confluent" at "https://packages.confluent.io/maven/",
+//  "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/",
+//  DefaultMavenRepository,
+//  Resolver.sonatypeRepo("public")
+//)

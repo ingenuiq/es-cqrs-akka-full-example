@@ -28,21 +28,24 @@ object Dependencies {
     val flyway:                   String = "7.9.1"
   }
 
-  val all: Seq[ModuleID] = ProductionDependencies.values ++ TestDependencies.values
+  val all:       Seq[ModuleID] = ProductionDependencies.dependencies ++ TestDependencies.dependencies
+  val allScala2: Seq[ModuleID] = ProductionDependencies.scala2Dependencies ++ TestDependencies.scala2Dependencies
 
   private[this] object ProductionDependencies {
 
-    val values: Seq[ModuleID] =
-      akka ++ avro4s ++ playJson ++ pureConfig ++ logging ++ query ++ postgres ++ enumeratum ++ kamon ++ commonCodec ++ flyway
+    val dependencies: Seq[ModuleID] =
+      postgres ++ commonCodec ++ flyway ++ loggingJava
+
+    val scala2Dependencies: Seq[ModuleID] = logging ++ akka ++ query ++ playJson ++ kamon ++ avro4s ++ enumeratum ++ pureConfig
 
     private lazy val akka: Seq[ModuleID] = Seq(
       "com.typesafe.akka" %% "akka-actor"                 % Versions.akka,
+      "com.typesafe.akka" %% "akka-persistence-cassandra" % Versions.akkaPersistenceCassandra,
       "com.typesafe.akka" %% "akka-stream"                % Versions.akka,
       "com.typesafe.akka" %% "akka-cluster"               % Versions.akka,
       "com.typesafe.akka" %% "akka-cluster-sharding"      % Versions.akka,
       "com.typesafe.akka" %% "akka-persistence-query"     % Versions.akka,
       "com.typesafe.akka" %% "akka-http-core"             % Versions.akkaHttp,
-      "com.typesafe.akka" %% "akka-persistence-cassandra" % Versions.akkaPersistenceCassandra,
       //      "com.swissborg"          %% "akka-persistence-postgres" % Versions.akkaPersistencePostgres,
       "ch.megard"              %% "akka-http-cors" % Versions.akkaHttpCors,
       "org.scala-lang.modules" %% "scala-xml"      % "2.0.0"
@@ -50,12 +53,11 @@ object Dependencies {
 
     private lazy val avro4s: Seq[ModuleID] = Seq("com.sksamuel.avro4s" %% "avro4s-core" % Versions.avro4s)
 
-    private lazy val logging: Seq[ModuleID] = Seq(
-      "ch.qos.logback"             % "logback-classic"  % Versions.logbackClassic,
-      "com.typesafe.scala-logging" %% "scala-logging"   % Versions.scalaLogging,
-      "org.slf4j"                  % "log4j-over-slf4j" % Versions.slf4j,
-      "com.typesafe.akka"          %% "akka-slf4j"      % Versions.akka
-    )
+    private lazy val loggingJava: Seq[ModuleID] =
+      Seq("ch.qos.logback" % "logback-classic" % Versions.logbackClassic, "org.slf4j" % "log4j-over-slf4j" % Versions.slf4j)
+
+    private lazy val logging: Seq[ModuleID] =
+      Seq("com.typesafe.scala-logging" %% "scala-logging" % Versions.scalaLogging, "com.typesafe.akka" %% "akka-slf4j" % Versions.akka)
 
     private lazy val pureConfig: Seq[ModuleID] = Seq("com.github.pureconfig" %% "pureconfig" % Versions.pureConfig)
 
@@ -79,8 +81,11 @@ object Dependencies {
 
     private val TestAndITs = "test;it"
 
-    lazy val values: Seq[ModuleID] =
-      (akkaTest ++ scalaTest ++ otherDepsTest ++ embeddedCassandra ++ h2 ++ slickTest).map(_ % TestAndITs)
+    lazy val dependencies: Seq[ModuleID] =
+      (mockito ++ h2).map(_ % TestAndITs)
+
+    lazy val scala2Dependencies: Seq[ModuleID] =
+      (akkaTest ++ scalaTest ++ embeddedCassandra ++ slickTest ++ clapper).map(_ % TestAndITs)
 
     private lazy val akkaTest: Seq[ModuleID] = Seq(
       "com.typesafe.akka"   %% "akka-testkit"              % Versions.akka,
@@ -99,8 +104,11 @@ object Dependencies {
 
 //    private lazy val postgres: Seq[ModuleID] = Seq("io.zonky.test" % "embedded-postgres" % Versions.embeddedPostgres)
 
-    private lazy val otherDepsTest: Seq[ModuleID] =
-      Seq("org.mockito" % "mockito-core" % Versions.mockitoCore, "org.clapper" %% "classutil" % Versions.classutil)
+    private lazy val mockito: Seq[ModuleID] =
+      Seq("org.mockito" % "mockito-core" % Versions.mockitoCore)
+
+    private lazy val clapper: Seq[ModuleID] =
+      Seq("org.clapper" %% "classutil" % Versions.classutil)
 
     private lazy val slickTest: Seq[ModuleID] = Seq("com.typesafe.slick" %% "slick-testkit" % Versions.slick)
 

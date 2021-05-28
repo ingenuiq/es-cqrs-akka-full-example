@@ -6,10 +6,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.15")
 
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.1.0-M7")
-
-addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
-
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
 
 addSbtPlugin("com.julianpeeters" % "sbt-avrohugger" % "2.0.0-RC15")
