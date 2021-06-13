@@ -1,0 +1,42 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /opt/docker/log/*.log
+  json.keys_under_root: true
+  exclude_lines: [ "^\\s+[\\-`('.|_]" ] # Drop ASCII Art
+  json.add_error_key: true
+  json.ignore_decoding_error: true
+  json.message_key: message
+  json.overwrite_keys: false
+  combine_partial: true
+  processors:
+    - timestamp:
+        field: timestamp
+        ignore_missing: true
+        ignore_failure: true
+        layouts:
+          - '2006-01-02T15:04:05.000-0700'
+        test:
+          - '2021-06-04T15:01:50.382+0200'
+
+setup.template:
+  enabled: true
+  overwrite: true
+  name: "filebeat-template"
+  pattern: "filebeat-*"
+  settings:
+    # A dictionary of settings to place into the settings.index dictionary
+    # of the Elasticsearch template. For more details, please check
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+    index:
+      number_of_shards: 1
+      refresh_interval: 10s
+      number_of_replicas: 1
+      codec: best_compression
+
+output.elasticsearch:
+  hosts: ['elasticsearch:9200']
+  index: "note-%{+yyyy.MM}"
+  username: elastic
+  password: changeme

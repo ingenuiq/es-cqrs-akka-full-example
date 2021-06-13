@@ -1,26 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration>
+<configuration scan="true">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%date{ISO8601} %-5level %logger %X{akkaSource} %X{sourceThread} - %msg%n</pattern>
+    <property name="MAX_FILE_SIZE" value="50MB"/>
+    <property name="TOTAL_SIZE_CAP" value="250MB"/>
+    <property name="MAX_DAYS_KEPT" value="14"/>
+
+    <property name="HOME" value="."/>
+    <property name="NAME_PREFIX" value="note-tests"/>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- %logger{0}.%M is stripping down package name, %logger.%M will give you the full package if needed -->
+            <pattern>[%blue(%date{HH:mm:ss.SSS})][%highlight(%-5level)][%magenta(%replace(%logger{0}.%M){'\.\?+|\$*\.\$.+\$+\d*|\$',''})] - %msg %blue(%marker) [%cyan(%thread)] %n</pattern>
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>target/note.log</file>
+    <appender name="logs" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${HOME}/log/${NAME_PREFIX}.log</file>
         <append>true</append>
-        <encoder>
-            <pattern>%date{ISO8601} %-5level %logger %X{akkaSource} %X{sourceThread} - %msg%n</pattern>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <message/>
+                <mdc/>
+                <logstashMarkers/>
+                <pattern>
+                    <pattern>
+                        {
+                        "timestamp": "%date{yyyy-MM-dd'T'HH:mm:ss.SSSZ}",
+                        "level": "%level",
+                        "class": "%replace(%logger.%M){'\\.\\?+|\\$*\\.\\$.+\\$+\\d*|\\$',''}",
+                        "short-class": "%replace(%logger{0}.%M){'\\.\\?+|\\$*\\.\\$.+\\$+\\d*|\\$',''}",
+                        "thread": "%thread"
+                        }
+                    </pattern>
+                </pattern>
+                <arguments/>
+                <stackTrace>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <maxLength>2048</maxLength>
+                        <shortenedClassNameLength>20</shortenedClassNameLength>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+            </providers>
         </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${HOME}/log/${NAME_PREFIX}.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_DAYS_KEPT}</maxHistory>
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
     </appender>
 
-    <root level="debug">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="STDOUT" />
+
+    <root level="${LOG_LEVEL:-INFO}">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="logs"/>
     </root>
 
+    <logger name="com.ingenuiq.note" level="TRACE"/>
     <logger name="com.datastax.driver.core" level="INFO"/>
 
     <logger name="akka" level="INFO"/>
